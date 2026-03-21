@@ -1,14 +1,14 @@
-# CEO Dream Works
+# CEO Before Sleep
 
 > A multi-agent business analysis skill for Claude Code.
 
-Five expert sub-agents analyze your business materials across 13 dimensions and deliver a CEO-grade report.
+Five expert sub-agents analyze your business materials across 13 dimensions and deliver a CEO-grade report — the kind of deep thinking a founder does at night before sleep, when the noise is gone and only clarity remains.
 
 ---
 
 ## How It Works
 
-**5 Agents × 13 Dimensions = 65 sequential analyses**
+**6 Agents × 14 Dimensions = up to 84 sequential analyses**
 
 | Agent | Role |
 |-------|------|
@@ -17,6 +17,7 @@ Five expert sub-agents analyze your business materials across 13 dimensions and 
 | Problem Solver | Concrete, actionable solutions |
 | Researcher | Market benchmarks and validation |
 | Consultant | Final CEO-level strategic advice |
+| Competitor Shadow | How competitors would exploit each weakness |
 
 Each agent reads all prior agents' outputs — depth compounds with every pass.
 
@@ -24,10 +25,10 @@ Each agent reads all prior agents' outputs — depth compounds with every pass.
 
 ## Installation
 
-Copy `CEO-dream-works.md` to your Claude Code skills folder:
+Copy `CEO-before-sleep.md` to your Claude Code skills folder:
 
 ```bash
-cp CEO-dream-works.md ~/.claude/skills/
+cp CEO-before-sleep.md ~/.claude/skills/
 ```
 
 ---
@@ -40,6 +41,7 @@ Trigger by describing your intent in conversation:
 CEO review of /path/to/my/project
 business analysis of this startup
 due diligence on /path/to/pitch/deck/folder
+before sleep analysis of my business
 ```
 
 Claude will automatically detect the request and run the full analysis.
@@ -53,7 +55,7 @@ Use the Python script to collect all materials and generate the report skeleton 
 ```bash
 python scripts/run_analysis.py \
   --folder /path/to/project \
-  --output /path/to/output/CEO_DreamWorks_Report.md
+  --output /path/to/output/CEO_BeforeSleep_Report.md
 ```
 
 **Requirements:**
@@ -67,13 +69,13 @@ pip install python-docx openpyxl python-pptx pymupdf
 
 | Mode | Dimensions | Agents | Total |
 |------|-----------|--------|-------|
-| Full Analysis (default) | 13 | 5 | 65 |
-| Core Analysis | 6 | 5 | 30 |
-| Quick Scan | 3 | 5 | 15 |
+| Full Analysis (default) | 14 | 6 | 84 |
+| Core Analysis | 6 | 6 | 36 |
+| Quick Scan | 3 | 6 | 18 |
 
 ---
 
-## The 13 Dimensions
+## The 14 Dimensions
 
 1. Item Profitability
 2. Talent Acquisition
@@ -86,14 +88,29 @@ pip install python-docx openpyxl python-pptx pymupdf
 9. GTM (Go-To-Market)
 10. Sales
 11. Most Urgent Task
-12. Biggest Risk
+12. Biggest Risk + 12-Month Scenario Modeling
 13. Crazy Founder's Advice (path to $100B)
+14. Execution Retro (post-seed only)
+
+---
+
+## Proposed Improvements (Roadmap)
+
+See the `CEO-before-sleep.md` skill file for the full roadmap. Key items:
+
+- **Competitor Shadow Agent** — 6th agent asks "how would a competitor attack this gap?"
+- **Quantified Scoring** — weighted 0–100 investability score replaces letter grades
+- **12-Month Scenario Modeling** — Base / Bull / Bear case for Biggest Risk
+- **Execution Retro** — measures planned vs. shipped velocity
+- **Action Plan Export** — auto-generates a sprint backlog from all findings
+- **Interactive Pause Mode** — Consultant asks one clarifying question per dimension
+- **`/ceo-sprint` Composite** — chains this skill with gStack for discovery → execution
 
 ---
 
 ## Token Budget
 
-Full analysis uses approximately 400,000–650,000+ tokens. This is intentional — CEO-level depth requires it.
+Full analysis uses approximately 500,000–840,000+ tokens. This is intentional — CEO-level depth requires it.
 
 ---
 
