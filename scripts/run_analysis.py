@@ -32,14 +32,16 @@ ANALYSIS_ITEMS = [
     {"id": 11, "name": "Most Urgent Task",      "desc": "The #1 thing that must be solved right now"},
     {"id": 12, "name": "Biggest Risk",          "desc": "The #1 thing that can kill this business"},
     {"id": 13, "name": "Crazy Founder's Advice","desc": "Path to $100B from a serial founder with multiple exits"},
+    {"id": 14, "name": "Execution Retro",       "desc": "Planned vs. shipped velocity over the last 90 days (post-seed only)"},
 ]
 
 AGENTS = [
-    {"id": "reviewer",       "name": "Reviewer",       "emoji": "📋", "desc": "Fact-based status assessment"},
-    {"id": "problem_finder", "name": "Problem Finder", "emoji": "⚠️", "desc": "Hidden issues, risks, and gaps"},
-    {"id": "problem_solver", "name": "Problem Solver", "emoji": "💡", "desc": "Concrete solutions and alternatives"},
-    {"id": "researcher",     "name": "Researcher",     "emoji": "📊", "desc": "Market benchmark comparison"},
-    {"id": "consultant",     "name": "Consultant",     "emoji": "🎯", "desc": "Final CEO-level advice"},
+    {"id": "reviewer",          "name": "Reviewer",          "emoji": "📋", "desc": "Fact-based status assessment"},
+    {"id": "problem_finder",    "name": "Problem Finder",    "emoji": "⚠️", "desc": "Hidden issues, risks, and gaps"},
+    {"id": "problem_solver",    "name": "Problem Solver",    "emoji": "💡", "desc": "Concrete solutions and alternatives"},
+    {"id": "researcher",        "name": "Researcher",        "emoji": "📊", "desc": "Market benchmark comparison"},
+    {"id": "consultant",        "name": "Consultant",        "emoji": "🎯", "desc": "Final CEO-level advice"},
+    {"id": "competitor_shadow", "name": "Competitor Shadow", "emoji": "🕵️", "desc": "How competitors exploit this weakness"},
 ]
 
 # ── File Reading Utilities ──────────────────────────────────

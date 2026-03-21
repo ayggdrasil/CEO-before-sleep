@@ -1,5 +1,8 @@
 # CEO Before Sleep — Improvement Roadmap
 
+> **v2.2.0 status**: All 5 items below are now implemented in `CEO-before-sleep.md`.
+> This file is archived for context on why each decision was made.
+
 Validated improvements drawn from comparing CEO Before Sleep against the gStack engineering sprint framework.
 
 ---
@@ -97,12 +100,12 @@ Phase 1.5: Live Product Validation
 
 ---
 
-## Implementation Priority
+## Implementation Status (v2.2.0)
 
-| # | Improvement | Effort | Impact |
-|---|---|---|---|
-| 1 | Quantified Scoring Rubric | Low | High — already templated |
-| 2 | Execution Retro (Dim 14) | Low | High — single dimension |
-| 3 | `/gstack:browse` Integration | Medium | High — requires live product |
-| 4 | Interactive Pause Mode | Medium | Medium — opt-in only |
-| 5 | Competitor Shadow Agent | High | High — 20% token increase |
+| # | Improvement | Status |
+|---|---|---|
+| 1 | Quantified Scoring Rubric | ✅ Implemented |
+| 2 | Execution Retro (Dim 14) | ✅ Implemented |
+| 3 | `/gstack:browse` Integration | ✅ Implemented (Phase 1.5) |
+| 4 | Interactive Pause Mode | ✅ Implemented (`--interactive`) |
+| 5 | Competitor Shadow Agent | ✅ Implemented (Agent 6) |

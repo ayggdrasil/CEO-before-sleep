@@ -1,15 +1,15 @@
 ---
 name: CEO-before-sleep
-version: 2.1.0
-description: Deeply analyze all materials in a project folder from a CEO's perspective. Five sub-agents (Reviewer, Problem Finder, Problem Solver, Researcher, Consultant) sequentially examine 13 analysis dimensions. Triggers when the user provides a folder path AND requests CEO-level review — e.g. "CEO review of /path", "due diligence on /path", "before sleep analysis of /path", "startup analysis", "investment analysis", "business diagnostics". Reads every document (.md, .docx, .pdf, .xlsx, .pptx, .txt, .csv, etc.), uses claude-opus-4-6 with 65+ iterative loops, and produces a structured markdown report. Works on any business material — pitch decks, memos, team docs, financials.
-changelog: "v2.1: +version field, structure separation, gStack sprint integration, Phase numbering fix"
+version: 2.2.0
+description: Deeply analyze all materials in a project folder from a CEO's perspective. Six sub-agents (Reviewer, Problem Finder, Problem Solver, Researcher, Consultant, Competitor Shadow) sequentially examine 14 analysis dimensions. Triggers when the user provides a folder path AND requests CEO-level review — e.g. "CEO review of /path", "due diligence on /path", "before sleep analysis of /path", "startup analysis", "investment analysis", "business diagnostics". Reads every document (.md, .docx, .pdf, .xlsx, .pptx, .txt, .csv, etc.), uses claude-opus-4-6 with 84+ iterative loops, and produces a structured markdown report. Works on any business material — pitch decks, memos, team docs, financials.
+changelog: "v2.2: +Competitor Shadow Agent (6th), +Dimension 14 Execution Retro, +Quantified Scoring, +Interactive Pause Mode, +Phase 1.5 Browse Integration"
 ---
 
 # CEO Before Sleep — Multi-Agent Business Analysis Skill
 
 > The kind of deep thinking a founder does at night before sleep, when the noise is gone and only clarity remains.
 
-**Why this architecture?** A single analyst introduces bias. The Reviewer summarizes facts, the Problem Finder hunts for issues, the Problem Solver proposes fixes, the Researcher validates against market data, and the Consultant delivers final CEO-level advice. Each agent receives the output of all previous agents, so depth compounds with every pass.
+**Why this architecture?** A single analyst introduces bias. The Reviewer summarizes facts, the Problem Finder hunts for issues, the Problem Solver proposes fixes, the Researcher validates against market data, the Consultant delivers CEO-level strategic advice, and the Competitor Shadow forces you to see the business through the enemy's eyes. Each agent receives the output of all previous agents — depth compounds with every pass.
 
 ---
 
@@ -23,7 +23,9 @@ Before reading a single file, ask the founder three forcing questions:
 2. **What would change your mind?** (the evidence that would flip your conclusion)
 3. **What are you most afraid to find?** (the area you've been avoiding)
 
-Prepend the answers to the context bundle. Every agent references them. This prevents 65-loop runs built on wrong assumptions.
+Prepend the answers to the context bundle. Every agent references them. This prevents 84-loop runs built on wrong assumptions.
+
+Also ask: **Is `--interactive` mode wanted?** (Consultant pauses after each dimension with one clarifying question.)
 
 ---
 
@@ -42,14 +44,29 @@ Optionally run `scripts/run_analysis.py --folder <path> --output <path>` to auto
 
 ---
 
+### Phase 1.5: Live Product Validation (if live product exists)
+
+When a live product URL is available, run this step before Phase 2:
+
+```
+Use /gstack:browse to screenshot the live product.
+Compare actual UX against what pitch materials claim.
+Flag discrepancies as RED issues — prepend to context bundle under "LIVE PRODUCT FINDINGS".
+```
+
+Ground truth beats pitch decks. Browsers don't lie.
+
+---
+
 ### Phase 2: Sequential Sub-Agent Analysis
 
 **Model**: `claude-opus-4-6`
-**Structure**: 13 dimensions × 5 agents = 65 sequential analyses
+**Structure**: 14 dimensions × 6 agents = 84 sequential analyses
+**Interactive mode**: If `--interactive`, the Consultant pauses after each dimension (see Agent 5 below).
 
 For each dimension, agents run in order. Each agent's output is appended to cumulative context before the next agent reads it.
 
-#### The 5 Agents
+#### The 6 Agents
 
 | Agent | Role | Core Question |
 |-------|------|---------------|
@@ -58,8 +75,9 @@ For each dimension, agents run in order. Each agent's output is appended to cumu
 | **Problem Solver** | Concrete, actionable solutions | "How can we fix this?" |
 | **Researcher** | Market data, benchmarks, validation | "How does the market view this?" |
 | **Consultant** | Final CEO-level strategic advice | "What should the CEO decide right now?" |
+| **Competitor Shadow** | Enemy's attack vector on this gap | "How would a competitor exploit this weakness?" |
 
-#### The 13 Dimensions
+#### The 14 Dimensions
 
 1. **Item Profitability** — Business model, unit economics, margin structure, scalability
 2. **Talent Acquisition** — Key talent pipeline, hiring strategy, retention, compensation
@@ -74,19 +92,33 @@ For each dimension, agents run in order. Each agent's output is appended to cumu
 11. **Most Urgent Task** — The #1 thing that must be solved right now
 12. **Biggest Risk** — The #1 thing that can kill this business
 13. **Crazy Founder's Advice** — Path to $100B from a serial founder with multiple exits
+14. **Execution Retro** — Planned vs. shipped velocity (post-seed only)
 
 ---
 
-### Phase 3: Report Generation
+### Phase 3: Report Generation + Scoring
 
 Save the final report to `<output_path>/CEO_BeforeSleep_Report.md`.
 Use the template in `templates/report_template.md`.
+
+**Composite Investability Score** — after all 84 loops complete:
+
+```
+Score = Σ (dimension_score × weight)
+
+Thresholds:
+  Score < 40  → flag for Quick Scan re-run after founder addresses gaps
+  Score 40–60 → Core Analysis recommended
+  Score > 60  → Full Analysis complete, proceed to gStack sprint
+```
+
+Fill in the weighted score table (in the template) by extracting the 0–100 score each Consultant assigned per dimension.
 
 ---
 
 ### Phase 4: Action Plan Export
 
-After all analyses complete, auto-generate a sprint-ready backlog by scanning all 65 outputs for items classified "Immediate" or "Do right now". Deduplicate and prioritize into:
+After all analyses complete, auto-generate a sprint-ready backlog by scanning all 84 outputs for items classified "Immediate" or "Do right now". Deduplicate and prioritize into:
 
 - **This Week** — Items from Dimension 11 (Most Urgent Task) + all RED-severity Quick Wins
 - **This Month** — Items classified "Do within 3 months"
@@ -125,13 +157,9 @@ Reflect   → /gstack:retro               # Capture what changed, update docs
 | `/gstack:ship` | ✅ | PR creation and merge |
 | `/gstack:document-release` | ✅ | Update docs after ship |
 | `/gstack:retro` | ✅ | Capture learnings |
-| `/gstack:browse` | ⚠️ optional | Add when live product validation needed |
+| `/gstack:browse` | ✅ | Live product validation (Phase 1.5) |
 | `/gstack:debug` | — | On-demand if tests fail |
 | `/gstack:guard` | — | On-demand for sensitive systems |
-
-**Missing from current gStack sprint for business analysis context:**
-- `/gstack:plan-design-review` — add if the urgent task has customer-facing UI
-- `/gstack:browse` — add if a live product exists to validate against findings
 
 **Full `/ceo-sprint` invocation:**
 ```
@@ -168,7 +196,7 @@ Role: Meticulously read the provided materials and produce an objective, fact-ba
 Method:
 1. List every fact related to this dimension that can be confirmed from the materials.
 2. Distinguish between what is explicitly stated and what is missing (information gaps).
-3. Rate the current state A–F with supporting evidence.
+3. Rate the current state on a 0–100 scale with supporting evidence.
 4. Assess positioning relative to typical industry standards.
 
 Output format:
@@ -176,7 +204,7 @@ Output format:
 - Confirmed strengths
 - Confirmed weaknesses
 - Missing information (important items not found in materials)
-- Status grade (A–F) + rationale
+- Status score (0–100) + grade (A–F) + rationale
 
 Tone: Objective, fact-driven, emotion-free.
 ```
@@ -276,9 +304,11 @@ Method:
 3. State "if we run this analysis again in 3 months, which metrics should have improved?"
 4. Offer counterintuitive advice boldly if warranted.
 5. Clearly state "what NOT to do."
+6. Assign a score 0–100 for this dimension (used in composite Investability Score).
 
 Output format:
 - One-line diagnosis for this dimension
+- Dimension score: [X / 100]
 - CEO key decision point
 - Recommended actions (priority + timeline)
 - Anti-patterns (what to avoid)
@@ -286,6 +316,39 @@ Output format:
 - Bold advice (even if it goes against conventional wisdom)
 
 Tone: Confident, direct, strategic. Diplomatic yet candid. Start with "If I were the CEO..."
+
+[INTERACTIVE MODE — only if --interactive was requested]
+After delivering advice, pause and present ONE clarifying question:
+  "Consultant's question: [specific question whose answer would materially change the analysis]"
+  "Your answer changes my recommendation for Dimensions [X, Y, Z]."
+  "Type your answer or press Enter to continue with current assumptions."
+Wait for founder input before proceeding to Agent 6 (Competitor Shadow).
+```
+
+---
+
+### Agent 6: Competitor Shadow
+
+```
+You are a Competitor Intelligence Analyst who thinks like the enemy.
+
+Role: For this dimension, identify how competitors would exploit the weaknesses uncovered.
+
+Method:
+1. Identify the top 3 competitors who could exploit the gap identified in this dimension.
+2. For each competitor:
+   - Name their most likely attack vector against this specific weakness
+   - Estimate their timeline to execute (3 / 6 / 12 months)
+   - Rate the threat: Existential / Serious / Manageable
+3. Answer: "If I were the CEO of [Competitor X], what would I do in the next 90 days
+   to make this business irrelevant?"
+
+Output format:
+- Competitor attack map (table: competitor × vector × timeline × threat level)
+- Most dangerous single move a competitor could make right now
+- Defensive countermove the CEO should pre-empt today
+
+Tone: Cold, analytical, adversarial. You are playing to win — against this company.
 ```
 
 ---
@@ -296,6 +359,7 @@ Tone: Confident, direct, strategic. Diplomatic yet candid. Start with "If I were
 
 All agents synthesize Dimensions 1–10 to derive the task that must be solved right now.
 Consultant must select exactly one #1 task in the format: "If you don't do this, X will happen within Y days."
+Competitor Shadow identifies which competitor is most likely to capitalize if this task is delayed.
 
 #### Dimension 12: Biggest Risk
 
@@ -328,6 +392,25 @@ Tone: Unfiltered, candid, inspiring. A touch of arrogance backed by deep experie
 Start with "If I were you..."
 ```
 
+#### Dimension 14: Execution Retro (post-seed only)
+
+Skip this dimension if the company has not yet shipped a product to real users.
+
+```
+Execution Retro: "What have you actually shipped in the last 90 days?"
+
+Reviewer:        List every concrete deliverable from the last quarter found in materials.
+Problem Finder:  Identify the gap between what was planned and what shipped.
+                 Quantify the slip: [X] planned, [Y] shipped, [Z]% execution rate.
+Problem Solver:  Propose a system to close the execution gap (OKRs, weekly demos, etc.)
+Researcher:      Benchmark shipped velocity against YC companies at the same stage.
+Consultant:      "If this team's shipping pace continues unchanged for 12 months,
+                  where does the company end up?"
+                  Assign an Execution Score (0–100): speed × quality × predictability.
+Competitor Shadow: Which competitor ships fastest in this space? What is their cadence?
+                   How many months until they catch up to what this team plans to ship?
+```
+
 ---
 
 ## Analysis Depth Control
@@ -336,9 +419,9 @@ Ask the user which mode before starting:
 
 | Mode | Dimensions | Agents | Loops |
 |------|-----------|--------|-------|
-| Full (default) | 13 | 5 | 65 |
-| Core | 6 (Profitability, Team, Tech, Finance, Urgent, Risk) | 5 | 30 |
-| Quick Scan | 3 (Urgent Task, Risk, Founder's Advice) | 5 | 15 |
+| Full (default) | 14 | 6 | 84 |
+| Core | 6 (Profitability, Team, Tech, Finance, Urgent, Risk) | 6 | 36 |
+| Quick Scan | 3 (Urgent Task, Risk, Founder's Advice) | 6 | 18 |
 
 ---
 
@@ -348,7 +431,7 @@ Ask the user which mode before starting:
 |------|-----------------|
 | Input context (material bundle) | 10,000–50,000 |
 | Single agent call | ~6,000–10,000 |
-| Full run (65 loops) | ~400,000–650,000+ |
+| Full run (84 loops) | ~500,000–840,000+ |
 | With gStack sprint handoff | +50,000–100,000 |
 
 ---
@@ -356,7 +439,7 @@ Ask the user which mode before starting:
 ## Notes
 
 - Always run Phase 0 first — 2 minutes of forcing questions saves hours of misaligned analysis.
+- Run Phase 1.5 if a live product URL exists — screenshot truth beats pitch deck claims.
 - Remove PII, passwords, and API keys from materials before running.
 - This report is reference-only. Consult qualified professionals for legal, financial, and tax matters.
-- See `ROADMAP.md` for planned improvements (Competitor Shadow Agent, Scoring Rubric, Execution Retro, Interactive Mode).
 - See `templates/report_template.md` for the output report structure.

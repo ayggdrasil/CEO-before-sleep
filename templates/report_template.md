@@ -3,9 +3,10 @@
 > **Target**: [folder/project name]
 > **Date**: [YYYY-MM-DD]
 > **Model**: claude-opus-4-6
-> **Version**: CEO-before-sleep v2.1.0
-> **Analysis loops**: 13 dimensions × 5 agents = 65 analyses
+> **Version**: CEO-before-sleep v2.2.0
+> **Analysis loops**: 14 dimensions × 6 agents = 84 analyses
 > **Files analyzed**: [N]
+> **Mode**: [Full / Core / Quick Scan] | [--interactive / standard]
 
 ---
 
@@ -41,8 +42,14 @@
 | **Total** | **100%** | | **[composite]** |
 
 ```
-Overall Investability Score: [X] / 100  →  [Grade A–F]
-Confidence: [High/Medium/Low] ([N] of 13 dimensions had sufficient data)
+Overall Investability Score: [X] / 100
+Grade: [A / B / C / D / F]
+Confidence: [High/Medium/Low] ([N] of 14 dimensions had sufficient data)
+
+Threshold interpretation:
+  < 40  → Re-run Quick Scan after founder addresses critical gaps
+  40–60 → Core Analysis recommended before proceeding
+  > 60  → Full Analysis complete — proceed to gStack sprint
 ```
 
 ---
@@ -51,6 +58,7 @@ Confidence: [High/Medium/Low] ([N] of 13 dimensions had sufficient data)
 *Business model, unit economics, margin structure, scalability*
 
 ### Current Status (Reviewer)
+<!-- Score: [X/100] -->
 
 ### Issues Identified (Problem Finder)
 <!-- RED critical / YELLOW caution / GREEN manageable -->
@@ -61,7 +69,12 @@ Confidence: [High/Medium/Low] ([N] of 13 dimensions had sufficient data)
 ### Market Benchmark (Researcher)
 
 ### CEO Advice (Consultant)
-<!-- Start with "If I were the CEO..." -->
+<!-- Start with "If I were the CEO..." | Dimension score: [X/100] -->
+
+### Competitor Attack Map (Competitor Shadow)
+<!-- Table: competitor × vector × timeline × threat level -->
+<!-- Most dangerous move: -->
+<!-- Defensive countermove: -->
 
 ---
 
@@ -73,6 +86,7 @@ Confidence: [High/Medium/Low] ([N] of 13 dimensions had sufficient data)
 ### Proposed Solutions (Problem Solver)
 ### Market Benchmark (Researcher)
 ### CEO Advice (Consultant)
+### Competitor Attack Map (Competitor Shadow)
 
 ---
 
@@ -84,6 +98,7 @@ Confidence: [High/Medium/Low] ([N] of 13 dimensions had sufficient data)
 ### Proposed Solutions (Problem Solver)
 ### Market Benchmark (Researcher)
 ### CEO Advice (Consultant)
+### Competitor Attack Map (Competitor Shadow)
 
 ---
 
@@ -95,6 +110,7 @@ Confidence: [High/Medium/Low] ([N] of 13 dimensions had sufficient data)
 ### Proposed Solutions (Problem Solver)
 ### Market Benchmark (Researcher)
 ### CEO Advice (Consultant)
+### Competitor Attack Map (Competitor Shadow)
 
 ---
 
@@ -106,6 +122,7 @@ Confidence: [High/Medium/Low] ([N] of 13 dimensions had sufficient data)
 ### Proposed Solutions (Problem Solver)
 ### Market Benchmark (Researcher)
 ### CEO Advice (Consultant)
+### Competitor Attack Map (Competitor Shadow)
 
 ---
 
@@ -117,6 +134,7 @@ Confidence: [High/Medium/Low] ([N] of 13 dimensions had sufficient data)
 ### Proposed Solutions (Problem Solver)
 ### Market Benchmark (Researcher)
 ### CEO Advice (Consultant)
+### Competitor Attack Map (Competitor Shadow)
 
 ---
 
@@ -128,6 +146,7 @@ Confidence: [High/Medium/Low] ([N] of 13 dimensions had sufficient data)
 ### Proposed Solutions (Problem Solver)
 ### Market Benchmark (Researcher)
 ### CEO Advice (Consultant)
+### Competitor Attack Map (Competitor Shadow)
 
 ---
 
@@ -139,6 +158,7 @@ Confidence: [High/Medium/Low] ([N] of 13 dimensions had sufficient data)
 ### Proposed Solutions (Problem Solver)
 ### Market Benchmark (Researcher)
 ### CEO Advice (Consultant)
+### Competitor Attack Map (Competitor Shadow)
 
 ---
 
@@ -150,6 +170,7 @@ Confidence: [High/Medium/Low] ([N] of 13 dimensions had sufficient data)
 ### Proposed Solutions (Problem Solver)
 ### Market Benchmark (Researcher)
 ### CEO Advice (Consultant)
+### Competitor Attack Map (Competitor Shadow)
 
 ---
 
@@ -161,6 +182,7 @@ Confidence: [High/Medium/Low] ([N] of 13 dimensions had sufficient data)
 ### Proposed Solutions (Problem Solver)
 ### Market Benchmark (Researcher)
 ### CEO Advice (Consultant)
+### Competitor Attack Map (Competitor Shadow)
 
 ---
 
@@ -178,6 +200,9 @@ Confidence: [High/Medium/Low] ([N] of 13 dimensions had sufficient data)
 2.
 3.
 
+### Competitor Risk if Delayed (Competitor Shadow)
+<!-- Which competitor moves first? What do they do? How many months? -->
+
 ---
 
 ## 12. Biggest Risk
@@ -186,7 +211,7 @@ Confidence: [High/Medium/Low] ([N] of 13 dimensions had sufficient data)
 ### Risk Matrix
 
 | Risk | Probability | Impact | Time Horizon | Lethal if unaddressed by |
-|------|------------|--------|--------------|--------------------------|
+|------|------------|--------|--------------|-----------------------------|
 | | High/Med/Low | High/Med/Low | | |
 | | | | | |
 | | | | | |
@@ -211,6 +236,8 @@ Confidence: [High/Medium/Low] ([N] of 13 dimensions had sufficient data)
 - Runway:
 - Company alive?
 
+### Competitor Attack Map (Competitor Shadow)
+
 ---
 
 ## 13. Crazy Founder's Advice
@@ -229,6 +256,30 @@ Confidence: [High/Medium/Low] ([N] of 13 dimensions had sufficient data)
 **What must never be compromised:**
 
 **Where the founder needs to grow personally:**
+
+---
+
+## 14. Execution Retro *(post-seed only — skip if pre-product)*
+*Planned vs. shipped velocity over the last 90 days*
+
+### What Actually Shipped (Reviewer)
+<!-- List every concrete deliverable found in materials -->
+
+### The Execution Gap (Problem Finder)
+<!-- [X] planned, [Y] shipped, [Z]% execution rate -->
+
+### Closing the Gap (Problem Solver)
+<!-- OKRs, weekly demos, ship cadence systems -->
+
+### Velocity Benchmark (Researcher)
+<!-- vs. YC companies at same stage -->
+
+### Trajectory Projection (Consultant)
+<!-- "If this shipping pace continues for 12 months..." -->
+<!-- Execution Score: [X/100] — speed × quality × predictability -->
+
+### Competitor Shipping Cadence (Competitor Shadow)
+<!-- Fastest competitor in this space — their cadence, their lead time -->
 
 ---
 
@@ -272,18 +323,22 @@ Confidence: [High/Medium/Low] ([N] of 13 dimensions had sufficient data)
 
 [List of all files read, with source paths]
 
-### B. Founder's Forcing Questions (Full Answers)
+### B. Live Product Findings (Phase 1.5)
+
+[Screenshots and UX discrepancies vs. pitch materials — or "No live product validated"]
+
+### C. Founder's Forcing Questions (Full Answers)
 
 [Verbatim answers from Phase 0]
 
-### C. Methodology
+### D. Methodology
 
-This report was generated using CEO Before Sleep v2.1.0.
-Five expert sub-agents (Reviewer, Problem Finder, Problem Solver, Researcher, Consultant)
-sequentially analyzed 13 key dimensions. Each agent referenced all prior agents' outputs
+This report was generated using CEO Before Sleep v2.2.0.
+Six expert sub-agents (Reviewer, Problem Finder, Problem Solver, Researcher, Consultant, Competitor Shadow)
+sequentially analyzed 14 key dimensions. Each agent referenced all prior agents' outputs
 to cumulatively deepen the analysis.
 
-### D. Disclaimer
+### E. Disclaimer
 
 This report is a reference document generated by an AI analysis tool.
 For legal, financial, and tax matters, consult qualified professionals.

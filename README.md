@@ -8,7 +8,7 @@ Five expert sub-agents analyze your business materials across 13 dimensions and 
 
 ## How It Works
 
-**6 Agents × 14 Dimensions = up to 84 sequential analyses**
+**6 Agents × 14 Dimensions = 84 sequential analyses**
 
 | Agent | Role |
 |-------|------|
@@ -94,17 +94,16 @@ pip install python-docx openpyxl python-pptx pymupdf
 
 ---
 
-## Proposed Improvements (Roadmap)
+## What's New in v2.2.0
 
-See the `CEO-before-sleep.md` skill file for the full roadmap. Key items:
+All roadmap items are now implemented:
 
-- **Competitor Shadow Agent** — 6th agent asks "how would a competitor attack this gap?"
-- **Quantified Scoring** — weighted 0–100 investability score replaces letter grades
-- **12-Month Scenario Modeling** — Base / Bull / Bear case for Biggest Risk
-- **Execution Retro** — measures planned vs. shipped velocity
-- **Action Plan Export** — auto-generates a sprint backlog from all findings
-- **Interactive Pause Mode** — Consultant asks one clarifying question per dimension
-- **`/ceo-sprint` Composite** — chains this skill with gStack for discovery → execution
+- **Competitor Shadow Agent** ✅ — 6th agent analyzes how top 3 competitors would exploit each weakness, with a 90-day attack countermove
+- **Quantified Scoring** ✅ — weighted 0–100 Investability Score with threshold rules (<40 re-run, 40–60 Core, >60 proceed)
+- **Execution Retro** ✅ — Dimension 14 measures planned vs. shipped velocity, benchmarked against YC companies
+- **Interactive Pause Mode** ✅ — `--interactive` flag makes Consultant pause after each dimension for one clarifying question
+- **Phase 1.5 Browse Integration** ✅ — `/gstack:browse` screenshots the live product before analysis begins
+- **`/ceo-sprint` Composite** — chains full CEO analysis with gStack sprint for discovery → execution in one command
 
 ---
 
