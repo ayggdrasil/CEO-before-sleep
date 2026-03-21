@@ -254,8 +254,8 @@ def main():
     print(f"Output path   : {output}")
     print(f"Project name  : {project_name}")
 
-    # Phase 0: Material collection
-    print("\nPhase 0: Collecting materials...")
+    # Phase 1: Material collection (Phase 0 = Scope Alignment questions, asked by Claude before this script)
+    print("\nPhase 1: Collecting materials...")
     context, file_list = collect_files(folder)
     print(f"  {len(file_list)} files found")
     print(f"  Context size : {len(context):,} characters")
@@ -294,7 +294,8 @@ def main():
     print(f"Metadata saved: {meta_path}")
 
     print(f"\n{'='*60}")
-    print(f"Phase 0 complete. Claude will now begin Phase 1 (sequential agent analysis).")
+    print(f"Phase 1 complete. Claude will now begin Phase 2 (sequential agent analysis).")
+    print(f"  Note: Run Phase 0 (Scope Alignment) first — ask the 3 forcing questions.")
     print(f"Dimensions : {len(ANALYSIS_ITEMS)}")
     print(f"Agents     : {len(AGENTS)}")
     print(f"Total loops: {len(ANALYSIS_ITEMS) * len(AGENTS)}")
