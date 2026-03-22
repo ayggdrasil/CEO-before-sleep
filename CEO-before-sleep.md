@@ -1,8 +1,8 @@
 ---
 name: CEO-before-sleep
-version: 2.2.0
-description: Deeply analyze all materials in a project folder from a CEO's perspective. Six sub-agents (Reviewer, Problem Finder, Problem Solver, Researcher, Consultant, Competitor Shadow) sequentially examine 14 analysis dimensions. Triggers when the user provides a folder path AND requests CEO-level review — e.g. "CEO review of /path", "due diligence on /path", "before sleep analysis of /path", "startup analysis", "investment analysis", "business diagnostics". Reads every document (.md, .docx, .pdf, .xlsx, .pptx, .txt, .csv, etc.), uses claude-opus-4-6 with 84+ iterative loops, and produces a structured markdown report. Works on any business material — pitch decks, memos, team docs, financials.
-changelog: "v2.2: +Competitor Shadow Agent (6th), +Dimension 14 Execution Retro, +Quantified Scoring, +Interactive Pause Mode, +Phase 1.5 Browse Integration"
+version: 3.0.0
+description: Deeply analyze all materials in a project folder from a CEO's perspective. Uses the Agent tool to spawn parallel dimension workers — 14 dimensions run concurrently, 6 roles run sequentially within each worker. Triggers on: "CEO review of /path", "due diligence on /path", "before sleep analysis of /path", "startup analysis", "investment analysis", "business diagnostics", "investor memo for /path", "competitor radar on /path". Reads every document (.md, .docx, .pdf, .xlsx, .pptx, .txt, .csv, etc.), uses claude-opus-4-6, and produces a structured markdown report.
+changelog: "v3.0: Full parallel orchestration — Agent tool spawns 14 dimension workers (parallel waves) + Synthesis Agent. Each worker runs 6 roles sequentially. | v2.3: +Phase 6 Investor Memo, +Phase 7 Competitor Radar | v2.2: +Competitor Shadow, +Execution Retro, +Scoring, +Interactive, +Browse"
 ---
 
 # CEO Before Sleep — Multi-Agent Business Analysis Skill
@@ -58,13 +58,74 @@ Ground truth beats pitch decks. Browsers don't lie.
 
 ---
 
-### Phase 2: Sequential Sub-Agent Analysis
+### Phase 2: Parallel Dimension Analysis (Agent Tool Orchestration)
 
 **Model**: `claude-opus-4-6`
-**Structure**: 14 dimensions × 6 agents = 84 sequential analyses
+**Structure**: 14 dimension workers run in parallel waves. Within each worker, 6 roles run sequentially.
+**Parallelism**: Dimensions are parallel. Roles within a dimension are sequential.
 **Interactive mode**: If `--interactive`, the Consultant pauses after each dimension (see Agent 5 below).
 
-For each dimension, agents run in order. Each agent's output is appended to cumulative context before the next agent reads it.
+```
+Orchestrator
+ ├─ WAVE 1 (parallel, Agent tool) ── Dims 1–10 ── all spawn simultaneously
+ │   Each worker: Reviewer→Finder→Solver→Researcher→Consultant→Shadow
+ │   Each writes: dim_01_*.md … dim_10_*.md
+ │   [wait for all 10]
+ │   Orchestrator builds wave1_summaries.md
+ │
+ ├─ WAVE 2 (parallel, Agent tool) ── Dims 11–14 ── all spawn simultaneously
+ │   Receive wave1_summaries.md as additional context
+ │   Each writes: dim_11_*.md … dim_14_*.md
+ │   [wait for all 4]
+ │
+ └─ SYNTHESIS AGENT (Agent tool, single)
+     reads all 14 dim_*.md → assembles report + action plan
+```
+
+**Shared context file:** Before spawning any workers, write all materials + Phase 0 answers to:
+`{output_path}/context_bundle.md` — every worker reads this file first.
+
+**Worker spawn pattern:** Dispatch all workers in a wave as a single message with multiple parallel Agent tool calls. Do not spawn them one by one.
+
+**Wave 1 dispatch table:**
+
+| Worker | Dim | Name | Output file |
+|--------|-----|------|-------------|
+| Agent call 1 | 01 | Item Profitability | `dim_01_item_profitability.md` |
+| Agent call 2 | 02 | Talent Acquisition | `dim_02_talent_acquisition.md` |
+| Agent call 3 | 03 | Team Composition | `dim_03_team_composition.md` |
+| Agent call 4 | 04 | Technology | `dim_04_technology.md` |
+| Agent call 5 | 05 | Legal | `dim_05_legal.md` |
+| Agent call 6 | 06 | Corporate Structure | `dim_06_corporate_structure.md` |
+| Agent call 7 | 07 | Finance | `dim_07_finance.md` |
+| Agent call 8 | 08 | Execution | `dim_08_execution.md` |
+| Agent call 9 | 09 | GTM | `dim_09_gtm.md` |
+| Agent call 10 | 10 | Sales | `dim_10_sales.md` |
+
+After Wave 1 completes: extract each Consultant's score + one-line diagnosis → write `wave1_summaries.md`.
+
+**Wave 2 dispatch table:**
+
+| Worker | Dim | Name | Special instructions |
+|--------|-----|------|---------------------|
+| Agent call 1 | 11 | Most Urgent Task | Synthesize Dims 1–10. One #1 task: "If you don't do X, Y happens in Z days." |
+| Agent call 2 | 12 | Biggest Risk | Risk matrix + Base/Bull/Bear scenarios |
+| Agent call 3 | 13 | Crazy Founder's Advice | Single serial-founder voice, 3 exits. Path to $100B. |
+| Agent call 4 | 14 | Execution Retro | Skip if pre-product. Quantify slip rate vs. YC benchmark. |
+
+After Wave 2 completes: spawn Synthesis Agent.
+
+**Synthesis Agent prompt:**
+```
+Read all 14 dim_*.md files from {output_path}/.
+Extract Consultant dimension scores (line: "Dimension score: [X / 100]").
+Compute Composite Investability Score (weighted formula).
+Assemble full report using templates/report_template.md.
+Write: {output_path}/CEO_BeforeSleep_Report.md
+Write: {output_path}/CEO_ActionPlan.md
+```
+
+For the full Dimension Worker Prompt Template, see `~/.claude/skills/CEO-before-sleep/SKILL.md`.
 
 #### The 6 Agents
 
@@ -125,6 +186,183 @@ After all analyses complete, auto-generate a sprint-ready backlog by scanning al
 - **This Quarter** — Items classified "Takes 6+ months" that are high-impact
 
 Format compatible with Linear, Notion, and GitHub Issues.
+
+---
+
+### Phase 6: Investor Memo
+
+After Full or Core Analysis completes, auto-draft a structured investor memo using the analysis as source material.
+
+**When to run:**
+- After Full or Core Analysis (sufficient data needed)
+- Can also run standalone: `/investor-memo <folder>` if an analysis report already exists
+- If Investability Score < 40: still generate the memo, but prepend a warning — sending it now may close doors
+
+**Three sub-agents:**
+
+| Agent | Role |
+|-------|------|
+| **Memo Writer** | Drafts clean, investor-readable narrative from analysis data |
+| **Devil's Advocate** | Flags the 3 questions every investor will ask that the memo doesn't answer well |
+| **Positioning Expert** | Sharpens the narrative: what's the one thing this company should be known for? |
+
+**Output:** `<output_path>/CEO_InvestorMemo.md`
+
+**Memo structure:**
+
+1. Header — Company, stage, ask, date
+2. TL;DR — One paragraph that earns the next 5 minutes of an investor's time
+3. Problem & Solution — What breaks without this, what changes with it
+4. Market Opportunity — TAM/SAM/SOM with numbers from Researcher's output
+5. Business Model — How it makes money, unit economics summary
+6. Traction — Key metrics pulled from Reviewer's confirmed facts
+7. Team — Signal-heavy, achievement-oriented (not just titles)
+8. The Ask — Amount, use of funds in 3 buckets, runway extension
+9. Risks & Mitigations — Top 3 risks from Dimension 12 + mitigation summary
+10. Appendix — Investability Score, key KPIs to watch in 3 months
+
+#### Memo Writer
+
+```
+You are an investor memo writer who has helped 30+ startups raise from Tier 1 VCs.
+
+Using the CEO Before Sleep analysis as your source, draft an investor memo that:
+1. Opens with TL;DR — one paragraph that earns the next 5 minutes of an investor's time
+2. States the problem as a pain the investor can feel, not an abstraction
+3. Presents the solution with one memorable differentiator
+4. Shows market size with specific numbers (from Researcher output — if absent, flag with [NEEDS DATA])
+5. Puts the strongest traction metric in bold in the first 100 words
+6. Writes the team section like a story — not a LinkedIn bio dump
+7. Closes with a clear ask: "$X to achieve Y by Z date"
+
+Rules:
+- Never use the words "disruptive", "innovative", "game-changing", or "paradigm"
+- If a section lacks data, write [DATA GAP: X needed] rather than bluffing
+- Keep the full memo under 1,500 words (body only, excluding appendix)
+- Match the language of the source materials
+```
+
+#### Devil's Advocate
+
+```
+You are a partner at a top-tier VC who has seen 10,000 pitches.
+
+Read the investor memo draft and identify:
+1. The 3 questions every serious investor will ask that this memo cannot answer well
+2. The #1 red flag a skeptical reader will fixate on
+3. The claim that is weakest — where data is missing or logic doesn't hold
+4. One sentence the founder should never say in a pitch meeting based on this memo
+
+For each issue: state the investor's actual objection, rate severity (Killer / Serious / Minor),
+and suggest the specific fix.
+```
+
+#### Positioning Expert
+
+```
+You are a brand strategist who has positioned Series A through IPO companies.
+
+Read the memo and answer:
+1. What is the one thing this company should be famous for — in one sentence?
+2. Does the current memo communicate that thing? (Yes / Partially / No)
+3. Who is the target investor persona — and does this memo speak their language?
+4. Rewrite the TL;DR to be 30% shorter and 2x more compelling.
+5. Suggest the ONE metric the company should lead every conversation with.
+```
+
+**Scoring gate:**
+
+```
+If Investability Score < 40:
+  Prepend to memo:
+  "⚠️  Investability Score [X]/100 is below the 40-point threshold.
+   Sending this memo now may close doors before you're ready.
+   Recommend addressing [top 2 critical gaps from Dimension 12] first.
+   Re-run analysis after addressing gaps."
+```
+
+---
+
+### Phase 7: Competitor Radar
+
+A dedicated competitive intelligence loop. Can run standalone or as a continuation of the full analysis.
+
+**Invocation:**
+```
+/competitor-radar <folder> [--competitors "Company A, Company B, Company C"]
+```
+
+Natural triggers: "competitor analysis of [folder]", "who are we up against", "competitive intelligence on [folder]", "competitive landscape"
+
+If `--competitors` is not provided, extract competitor names from the materials automatically. Confirm with the founder before running.
+
+**Three dedicated agents:**
+
+| Agent | Role |
+|-------|------|
+| **Intel Collector** | Profiles each competitor: model, stage, funding, strengths, GTM |
+| **Threat Mapper** | Maps each competitor's attack vector across all 14 dimensions |
+| **Counter-Strategist** | Designs the defensive playbook, moat-builders, and asymmetric bets |
+
+**Output:** `<output_path>/CEO_CompetitorRadar.md`
+
+#### Intel Collector
+
+```
+You are a competitive intelligence analyst.
+
+For each named competitor:
+1. Summarize their business model, stage, funding, and known strengths
+2. Extract any direct mentions of them from the analyzed materials
+3. Identify their primary customer segment and GTM motion
+4. Rate your confidence in this data: High / Medium / Low (note what is missing)
+
+Output: one profile card per competitor with a confidence rating.
+```
+
+#### Threat Mapper
+
+```
+You are a competitive strategy analyst who thinks in attack vectors.
+
+For each competitor, map their threat level against each of the 14 analysis dimensions:
+
+| Dimension | Competitor A | Competitor B | Competitor C |
+|-----------|-------------|-------------|-------------|
+| [dim]     | Existential / Serious / Manageable / None | ... | ... |
+
+Then for each Existential or Serious threat:
+- Describe the specific attack vector (how would they execute it?)
+- Estimate timeline: 90 days / 6 months / 12 months
+- Identify the trigger condition: "They move when [X] happens"
+
+Output: Competitive Heat Map + Attack Vector Detail per threat.
+```
+
+#### Counter-Strategist
+
+```
+You are a CEO who has competed against each of these players before and won.
+
+For each Existential or Serious threat identified by the Threat Mapper:
+1. Pre-emptive move: What should the CEO do in the next 30 days to neutralize this?
+2. Moat-builder: What would make this dimension defensible within 12 months?
+3. Asymmetric bet: What can this company do that the competitor structurally cannot?
+
+Output: Defensive Playbook with 30-day actions, 90-day moat builders, and asymmetric advantages.
+
+Conclude with:
+"The #1 competitor to fear right now is [X] because [one sentence].
+ The window to neutralize them is [Y] months."
+```
+
+**Radar modes:**
+
+| Mode | Competitors | Dimensions | Use when |
+|------|------------|-----------|----------|
+| Full Radar | All identified | 14 | Pre-fundraise, annual strategy |
+| Focused Radar | 1–2 specific | All 14 | Known threat emerging |
+| Hot Spots Only | All identified | Existential threats only | Quick check-in |
 
 ---
 
@@ -427,12 +665,17 @@ Ask the user which mode before starting:
 
 ## Token Usage Estimate
 
-| Item | Estimated Tokens |
-|------|-----------------|
-| Input context (material bundle) | 10,000–50,000 |
-| Single agent call | ~6,000–10,000 |
-| Full run (84 loops) | ~500,000–840,000+ |
-| With gStack sprint handoff | +50,000–100,000 |
+| Item | Tokens | Notes |
+|------|--------|-------|
+| context_bundle.md (input per worker) | 10,000–50,000 | shared read by all workers |
+| Single dimension worker (6 roles) | ~40,000–60,000 | |
+| Wave 1: 10 workers (parallel) | ~400,000–600,000 | wall-clock = 1 worker's time |
+| Wave 2: 4 workers (parallel) | ~160,000–240,000 | wall-clock = 1 worker's time |
+| Synthesis Agent | ~30,000–50,000 | |
+| Phase 6: Investor Memo | +18,000–30,000 | |
+| Phase 7: Competitor Radar | +30,000–60,000 | |
+| gStack sprint handoff | +50,000–100,000 | |
+| **Full run total** | **~640,000–980,000** | **wall-clock ≈ 3 worker turns** |
 
 ---
 

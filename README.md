@@ -2,13 +2,13 @@
 
 > A multi-agent business analysis skill for Claude Code.
 
-Five expert sub-agents analyze your business materials across 13 dimensions and deliver a CEO-grade report — the kind of deep thinking a founder does at night before sleep, when the noise is gone and only clarity remains.
+Six expert sub-agents analyze your business materials across 14 dimensions and deliver a CEO-grade report — the kind of deep thinking a founder does at night before sleep, when the noise is gone and only clarity remains. Includes an Investor Memo generator and a Competitor Radar for competitive intelligence.
 
 ---
 
 ## How It Works
 
-**6 Agents × 14 Dimensions = 84 sequential analyses**
+**6 Agents × 14 Dimensions = 84 analyses — 14 parallel workers, 6 sequential roles each**
 
 | Agent | Role |
 |-------|------|
@@ -42,9 +42,11 @@ CEO review of /path/to/my/project
 business analysis of this startup
 due diligence on /path/to/pitch/deck/folder
 before sleep analysis of my business
+investor memo for /path/to/my/project
+competitor radar on /path/to/my/project --competitors "Stripe, Square, Brex"
 ```
 
-Claude will automatically detect the request and run the full analysis.
+Claude will automatically detect the request and run the appropriate analysis.
 
 ---
 
@@ -94,9 +96,21 @@ pip install python-docx openpyxl python-pptx pymupdf
 
 ---
 
-## What's New in v2.2.0
+## What's New in v3.0.0
 
-All roadmap items are now implemented:
+- **Parallel orchestration via Agent tool** ✅ — Phase 2 is no longer a sequential loop. The orchestrator spawns 14 dimension workers using the `Agent` tool in two parallel waves. Wall-clock time drops from ~14x to ~3x a single worker's time.
+- **Wave 1** — 10 workers spawn simultaneously (Dims 1–10), each writing its own `dim_0N_*.md` file.
+- **Wave 2** — 4 workers spawn simultaneously (Dims 11–14), receiving `wave1_summaries.md` as additional context.
+- **Synthesis Agent** — Reads all 14 `dim_*.md` files, extracts dimension scores, computes the Composite Investability Score, and assembles `CEO_BeforeSleep_Report.md` and `CEO_ActionPlan.md`.
+- **Shared context via `context_bundle.md`** — All materials + Phase 0 answers written to disk once; every worker reads the same file. No re-passing giant context strings in every prompt.
+- **Dimension Worker Prompt Template** — Reusable template in `SKILL.md` for all 14 workers. Fill dimension name/description/path and dispatch.
+
+## What's New in v2.3.0
+
+- **Phase 6: Investor Memo** ✅ — Three-agent pipeline (Memo Writer, Devil's Advocate, Positioning Expert) auto-drafts a VC-ready memo from the analysis. Flags data gaps. Includes scoring gate for Investability Score < 40.
+- **Phase 7: Competitor Radar** ✅ — Dedicated competitive intelligence loop (Intel Collector, Threat Mapper, Counter-Strategist). Outputs a heat map across all 14 dimensions, a 90-day threat calendar, and a defensive playbook. Invokable standalone as `/competitor-radar`.
+
+## What's New in v2.2.0
 
 - **Competitor Shadow Agent** ✅ — 6th agent analyzes how top 3 competitors would exploit each weakness, with a 90-day attack countermove
 - **Quantified Scoring** ✅ — weighted 0–100 Investability Score with threshold rules (<40 re-run, 40–60 Core, >60 proceed)
@@ -109,7 +123,17 @@ All roadmap items are now implemented:
 
 ## Token Budget
 
-Full analysis uses approximately 500,000–840,000+ tokens. This is intentional — CEO-level depth requires it.
+| Run | Tokens | Wall-clock |
+|-----|--------|-----------|
+| Wave 1: 10 workers in parallel | ~400,000–600,000 | 1 worker's time |
+| Wave 2: 4 workers in parallel | ~160,000–240,000 | 1 worker's time |
+| Synthesis Agent | ~30,000–50,000 | — |
+| Full analysis total | ~640,000–980,000 | ~3 worker turns |
+| + Phase 6: Investor Memo | +18,000–30,000 | — |
+| + Phase 7: Competitor Radar | +30,000–60,000 | — |
+| + gStack sprint handoff | +50,000–100,000 | — |
+
+This is intentional — CEO-level depth requires it.
 
 ---
 
